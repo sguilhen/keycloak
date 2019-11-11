@@ -195,7 +195,12 @@
     "vault": {
         "files-plaintext": {
             "dir": "target/dependency/vault",
-            "enabled": "${keycloak.vault.plaintext.provider.enabled:false}"
+            "enabled": "${keycloak.vault.files-plaintext.provider.enabled:false}"
+        },
+        "elytron-cs-keystore": {
+            "location": "target/dependency/vault/credential-store.jceks",
+            "secret": "MASK-3u2HNQaMogJJ8VP7J6gRIl;12345678;321",
+            "enabled": "${keycloak.vault.elytron-cs-keystore.provider.enabled:false}"
         }
     }
 }

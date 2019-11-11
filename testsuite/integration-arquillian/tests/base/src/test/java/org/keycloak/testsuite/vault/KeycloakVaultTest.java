@@ -45,7 +45,7 @@ public class KeycloakVaultTest extends AbstractKeycloakTest {
 
     @Deployment
     public static WebArchive deploy() {
-        return RunOnServerDeployment.create();
+        return RunOnServerDeployment.create(KeycloakVaultTest.class, KeycloakElytronCSVaultTest.class);
     }
 
     @Override

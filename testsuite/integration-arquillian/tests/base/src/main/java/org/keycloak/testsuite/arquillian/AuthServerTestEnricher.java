@@ -460,7 +460,7 @@ public class AuthServerTestEnricher {
         testContextProducer.set(testContext);
 
         if (event.getTestClass().isAnnotationPresent(EnableVault.class)) {
-            VaultUtils.enableVault(suiteContext);
+            VaultUtils.enableVault(suiteContext, event.getTestClass().getAnnotation(EnableVault.class).providerId());
             restartAuthServer();
             testContext.reconnectAdminClient();
         }
@@ -581,7 +581,7 @@ public class AuthServerTestEnricher {
         removeTestRealms(testContext, adminClient);
 
         if (event.getTestClass().isAnnotationPresent(EnableVault.class)) {
-            VaultUtils.disableVault(suiteContext);
+            VaultUtils.disableVault(suiteContext, event.getTestClass().getAnnotation(EnableVault.class).providerId());
             restartAuthServer();
             testContext.reconnectAdminClient();
         }
