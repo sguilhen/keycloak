@@ -38,6 +38,7 @@ public interface UserModel extends RoleMapperModel {
     String EMAIL_VERIFIED = "emailVerified";
     String LOCALE = "locale";
     String ENABLED = "enabled";
+    String CREATED_AFTER_TIMESTAMP = "createdTimestamp";
     String IDP_ALIAS = "keycloak.session.realm.users.query.idp_alias";
     String IDP_USER_ID = "keycloak.session.realm.users.query.idp_user_id";
     String INCLUDE_SERVICE_ACCOUNT = "keycloak.session.realm.users.query.include_service_account";

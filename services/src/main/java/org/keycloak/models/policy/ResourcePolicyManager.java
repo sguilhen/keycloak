@@ -17,6 +17,10 @@ public class ResourcePolicyManager {
         this.session = session;
     }
 
+    public ResourcePolicy addPolicy(String providerId) {
+        return addPolicy(new ResourcePolicy(providerId));
+    }
+
     public ResourcePolicy addPolicy(ResourcePolicy policy) {
         RealmModel realm = getRealm();
         ComponentModel model = new ComponentModel();
@@ -24,7 +28,6 @@ public class ResourcePolicyManager {
         model.setParentId(realm.getId());
         model.setProviderId(policy.getProviderId());
         model.setProviderType(ResourcePolicyProvider.class.getName());
-        model.setConfig(policy.getConfig());
 
         return new ResourcePolicy(realm.addComponentModel(model));
     }
@@ -37,6 +40,7 @@ public class ResourcePolicyManager {
         actionModel.setParentId(policyModel.getId());
         actionModel.setProviderId(action.getProviderId());
         actionModel.setProviderType(ResourceActionProvider.class.getName());
+        actionModel.setConfig(action.getConfig());
 
         return new ResourceAction(realm.addComponentModel(actionModel));
     }
@@ -69,9 +73,9 @@ public class ResourcePolicyManager {
         for (ResourceAction action : getActions(policy)) {
             ComponentFactory<?, ?> actionFactory = (ComponentFactory<?, ?>) session.getKeycloakSessionFactory()
                     .getProviderFactory(ResourceActionProvider.class, action.getProviderId());
-            ResourceActionProvider actionProvider = (ResourceActionProvider) factory.create(session, getRealm().getComponent(policy.getId()));
+            ResourceActionProvider actionProvider = (ResourceActionProvider) actionFactory.create(session, getRealm().getComponent(policy.getId()));
 
-            actionProvider.run(time -> policyProvider.getResources(time));
+            actionProvider.run(policyProvider::getResources);
         }
     }
 

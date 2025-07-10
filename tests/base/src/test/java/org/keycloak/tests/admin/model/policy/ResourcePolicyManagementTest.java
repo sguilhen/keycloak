@@ -1,6 +1,7 @@
 package org.keycloak.tests.admin.model.policy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Duration;
@@ -11,6 +12,7 @@ import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.policy.DisableUserActionProvider;
 import org.keycloak.models.policy.DisableUserActionProviderFactory;
 import org.keycloak.models.policy.ResourceAction;
 import org.keycloak.models.policy.ResourcePolicy;
@@ -90,11 +92,10 @@ public class ResourcePolicyManagementTest {
     private static void testRunPolicySetup(KeycloakSession session) {
         RealmModel realm = configureSessionContext(session);
         ResourcePolicyManager manager = new ResourcePolicyManager(session);
-        ResourcePolicy policy = manager.addPolicy(UserCreationDateResourcePolicyProvider.builder()
-                .createdAfter(Duration.ofDays(5))
-        );
+        ResourcePolicy policy = manager.addPolicy(UserCreationDateResourcePolicyProviderFactory.ID);
 
-        manager.addAction(policy, new ResourceAction(DisableUserActionProviderFactory.ID));
+        manager.addAction(policy, DisableUserActionProvider.builder()
+                .createdAfter(Duration.ofDays(5)));
 
         UserModel user = session.users().addUser(realm, "myuser");
 
@@ -102,9 +103,11 @@ public class ResourcePolicyManagementTest {
     }
 
     private static void testRunPolicy(KeycloakSession session) {
-        configureSessionContext(session);
+        RealmModel realm = configureSessionContext(session);
         ResourcePolicyManager manager = new ResourcePolicyManager(session);
         manager.runPolicies();
+        UserModel user = session.users().getUserByUsername(realm, "myuser");
+        assertFalse(user.isEnabled());
     }
 
     private static RealmModel configureSessionContext(KeycloakSession session) {
