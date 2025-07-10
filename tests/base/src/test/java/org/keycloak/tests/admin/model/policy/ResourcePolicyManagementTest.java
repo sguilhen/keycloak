@@ -95,11 +95,12 @@ public class ResourcePolicyManagementTest {
         ResourcePolicy policy = manager.addPolicy(UserCreationDateResourcePolicyProviderFactory.ID);
 
         manager.addAction(policy, DisableUserActionProvider.builder()
-                .createdAfter(Duration.ofDays(5)));
+                .createdAfter(Duration.ofDays(10)));
 
         UserModel user = session.users().addUser(realm, "myuser");
 
-        user.setCreatedTimestamp(System.currentTimeMillis() - Duration.ofDays(5).toMillis());
+        user.setEnabled(true);
+        user.setCreatedTimestamp(System.currentTimeMillis() + Duration.ofDays(20).toMillis());
     }
 
     private static void testRunPolicy(KeycloakSession session) {

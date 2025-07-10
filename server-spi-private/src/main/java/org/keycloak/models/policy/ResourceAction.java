@@ -20,6 +20,7 @@ public class ResourceAction {
     public ResourceAction(ComponentModel model) {
         this.id = model.getId();
         this.providerId = model.getProviderId();
+        this.config = model.getConfig();
     }
 
     public String getId() {

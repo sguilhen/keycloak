@@ -73,7 +73,7 @@ public class ResourcePolicyManager {
         for (ResourceAction action : getActions(policy)) {
             ComponentFactory<?, ?> actionFactory = (ComponentFactory<?, ?>) session.getKeycloakSessionFactory()
                     .getProviderFactory(ResourceActionProvider.class, action.getProviderId());
-            ResourceActionProvider actionProvider = (ResourceActionProvider) actionFactory.create(session, getRealm().getComponent(policy.getId()));
+            ResourceActionProvider actionProvider = (ResourceActionProvider) actionFactory.create(session, getRealm().getComponent(action.getId()));
 
             actionProvider.run(policyProvider::getResources);
         }

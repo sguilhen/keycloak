@@ -31,15 +31,14 @@ public class UserCreationDateResourcePolicyProvider implements ResourcePolicyPro
 
     @Override
     public List<String> getResources(Long time) {
-        RealmModel realm = session.getContext().getRealm();
         EntityManager entityManager = session.getProvider(JpaConnectionProvider.class).getEntityManager();
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<String> query = builder.createQuery(String.class);
         Root<UserEntity> from = query.from(UserEntity.class);
 
-        // add the predicates here
+        query.where(builder.greaterThanOrEqualTo(from.get("createdTimestamp"),
+                builder.sum(from.get("createdTimestamp"), time)));
 
-        return session.users().searchForUserStream(realm, Map.of(UserModel.CREATED_AFTER_TIMESTAMP, String.valueOf(time)))
-                .map(UserModel::getId).toList();
+        return entityManager.createQuery(query).getResultList();
     }
 }
