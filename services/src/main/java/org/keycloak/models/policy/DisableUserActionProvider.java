@@ -1,8 +1,7 @@
 package org.keycloak.models.policy;
 
-import java.time.Duration;
-import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
 
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
@@ -23,10 +22,7 @@ public class DisableUserActionProvider implements ResourceActionProvider {
     }
 
     @Override
-    public void run(List<Object> resources) {
-        for (Object resource : resources) {
-
-        }
+    public void run(Function<Long, List<String>> resources) {
     }
 
     @Override

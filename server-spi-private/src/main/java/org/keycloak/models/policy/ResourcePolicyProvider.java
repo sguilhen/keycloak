@@ -6,5 +6,5 @@ import org.keycloak.provider.Provider;
 
 public interface ResourcePolicyProvider extends Provider {
 
-    List<Object> getResources();
+    List<String> getResources(Long time);
 }

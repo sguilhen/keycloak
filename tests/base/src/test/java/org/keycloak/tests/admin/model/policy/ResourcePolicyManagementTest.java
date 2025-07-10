@@ -15,6 +15,7 @@ import org.keycloak.models.policy.DisableUserActionProviderFactory;
 import org.keycloak.models.policy.ResourceAction;
 import org.keycloak.models.policy.ResourcePolicy;
 import org.keycloak.models.policy.ResourcePolicyManager;
+import org.keycloak.models.policy.UserCreationDateResourcePolicyProvider;
 import org.keycloak.models.policy.UserCreationDateResourcePolicyProviderFactory;
 import org.keycloak.testframework.annotations.KeycloakIntegrationTest;
 import org.keycloak.testframework.remote.providers.runonserver.RunOnServer;
@@ -82,21 +83,27 @@ public class ResourcePolicyManagementTest {
 
     @Test
     public void testRunPolicy() {
+        runOnServer.run((RunOnServer) ResourcePolicyManagementTest::testRunPolicySetup);
         runOnServer.run((RunOnServer) ResourcePolicyManagementTest::testRunPolicy);
     }
 
-    private static void testRunPolicy(KeycloakSession session) {
+    private static void testRunPolicySetup(KeycloakSession session) {
         RealmModel realm = configureSessionContext(session);
         ResourcePolicyManager manager = new ResourcePolicyManager(session);
-        ResourcePolicy policy = manager.addPolicy(new ResourcePolicy(UserCreationDateResourcePolicyProviderFactory.ID));
+        ResourcePolicy policy = manager.addPolicy(UserCreationDateResourcePolicyProvider.builder()
+                .createdAfter(Duration.ofDays(5))
+        );
 
         manager.addAction(policy, new ResourceAction(DisableUserActionProviderFactory.ID));
 
         UserModel user = session.users().addUser(realm, "myuser");
 
         user.setCreatedTimestamp(System.currentTimeMillis() - Duration.ofDays(5).toMillis());
-        session.getProvider(JpaConnectionProvider.class).getEntityManager().flush();
+    }
 
+    private static void testRunPolicy(KeycloakSession session) {
+        configureSessionContext(session);
+        ResourcePolicyManager manager = new ResourcePolicyManager(session);
         manager.runPolicies();
     }
 

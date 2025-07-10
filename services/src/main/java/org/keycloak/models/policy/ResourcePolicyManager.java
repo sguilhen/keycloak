@@ -1,10 +1,13 @@
 package org.keycloak.models.policy;
 
 import java.util.List;
+import java.util.function.Function;
 
+import org.keycloak.component.ComponentFactory;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.provider.ProviderFactory;
 
 public class ResourcePolicyManager {
 
@@ -21,6 +24,7 @@ public class ResourcePolicyManager {
         model.setParentId(realm.getId());
         model.setProviderId(policy.getProviderId());
         model.setProviderType(ResourcePolicyProvider.class.getName());
+        model.setConfig(policy.getConfig());
 
         return new ResourcePolicy(realm.addComponentModel(model));
     }
@@ -58,14 +62,16 @@ public class ResourcePolicyManager {
     }
 
     private void runPolicy(ResourcePolicy policy) {
-        ResourcePolicyProvider policyProvider = session.getComponentProvider(ResourcePolicyProvider.class, policy.getId());
-
-        List<Object> resources = policyProvider.getResources();
+        ComponentFactory<?, ?> factory = (ComponentFactory<?, ?>) session.getKeycloakSessionFactory()
+                .getProviderFactory(ResourcePolicyProvider.class, policy.getProviderId());
+        ResourcePolicyProvider policyProvider = (ResourcePolicyProvider) factory.create(session, getRealm().getComponent(policy.getId()));
 
         for (ResourceAction action : getActions(policy)) {
-            ResourceActionProvider actionProvider = session.getComponentProvider(ResourceActionProvider.class, policy.getId());
+            ComponentFactory<?, ?> actionFactory = (ComponentFactory<?, ?>) session.getKeycloakSessionFactory()
+                    .getProviderFactory(ResourceActionProvider.class, action.getProviderId());
+            ResourceActionProvider actionProvider = (ResourceActionProvider) factory.create(session, getRealm().getComponent(policy.getId()));
 
-            actionProvider.run(resources);
+            actionProvider.run(time -> policyProvider.getResources(time));
         }
     }
 
