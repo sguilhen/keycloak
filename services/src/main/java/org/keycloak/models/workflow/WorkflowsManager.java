@@ -253,7 +253,7 @@ public class WorkflowsManager {
                         workflow.setEnabled(false);
                         workflow.setError(e.getMessage());
                         updateWorkflow(workflow, workflow.getConfig());
-                        log.debugf("Workflow %s was disabled due to: %s", workflow.getId(), e.getMessage());
+                        log.warnf("Workflow %s was disabled due to: %s", workflow.getId(), e.getMessage());
                     }
                 });
     }
