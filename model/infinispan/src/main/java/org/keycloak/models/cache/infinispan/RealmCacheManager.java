@@ -26,6 +26,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.cache.infinispan.entities.Revisioned;
 import org.keycloak.models.cache.infinispan.events.InvalidationEvent;
 import org.keycloak.models.cache.infinispan.events.RealmCacheInvalidationEvent;
+import org.keycloak.models.cache.infinispan.stream.HasClientScopePredicate;
 import org.keycloak.models.cache.infinispan.stream.GroupListPredicate;
 import org.keycloak.models.cache.infinispan.stream.HasRolePredicate;
 import org.keycloak.models.cache.infinispan.stream.InClientPredicate;
@@ -89,9 +90,22 @@ public class RealmCacheManager extends CacheManager {
         invalidations.add(RealmCacheSession.getClientScopesCacheKey(realmId));
     }
 
+    // Backwards-compatible overload: if clientScopeId is not provided, fall back to invalidating whole realm client-scope entries
     public void clientScopeRemoval(String realmId, Set<String> invalidations) {
         invalidations.add(RealmCacheSession.getClientScopesCacheKey(realmId));
         addInvalidations(InRealmPredicate.create().realm(realmId), invalidations);
+    }
+
+    public void clientScopeRemoval(String realmId, String clientScopeId, Set<String> invalidations) {
+        // Always invalidate the realm-level client scopes list
+        invalidations.add(RealmCacheSession.getClientScopesCacheKey(realmId));
+        // Invalidate only per-client assigned-scopes entries that reference this client-scope
+        addInvalidations(HasClientScopePredicate.create().clientScope(clientScopeId), invalidations);
+
+        // Also invalidate any cached client roles or client-scope entities that reference this client-scope id.
+        // HasRolePredicate covers CachedClient/CachedClientScope entries that include the scope id in their
+        // scope lists (see HasRolePredicate.test which checks CachedClient.getScope() and CachedClientScope.getScope()).
+        addInvalidations(HasRolePredicate.create().role(clientScopeId), invalidations);
     }
 
     public void groupQueriesInvalidations(String realmId, Set<String> invalidations) {

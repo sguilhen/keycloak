@@ -130,6 +130,7 @@ public final class Marshalling {
     public static final int IN_GROUP_PREDICATE = 65571;
     public static final int IN_IDENTITY_PROVIDER_PREDICATE = 65572;
     public static final int IN_REALM_PREDICATE = 65573;
+    public static final int HAS_CLIENT_SCOPE_PREDICATE = 65621;
 
     // models.cache.infinispan.events package
     public static final int AUTHENTICATION_SESSION_AUTH_NOTE_UPDATE_EVENT = 65574;

@@ -39,6 +39,6 @@ public class ClientScopeRemovedEvent extends BaseClientScopeEvent {
 
     @Override
     public void addInvalidations(RealmCacheManager realmCache, Set<String> invalidations) {
-        realmCache.clientScopeRemoval(realmId, invalidations);
+        realmCache.clientScopeRemoval(realmId, getId(), invalidations);
     }
 }

@@ -1505,7 +1505,7 @@ public class RealmCacheSession implements CacheRealmProvider {
 
         // This will make sure to all invalidate all clients dependent on clientScope
         listInvalidations.add(realm.getId());
-        cache.clientScopeRemoval(realm.getId(), invalidations);
+        cache.clientScopeRemoval(realm.getId(), clientScope.getId(), invalidations);
         invalidationEvents.add(ClientScopeRemovedEvent.create(clientScope.getId(), realm.getId()));
     }
 

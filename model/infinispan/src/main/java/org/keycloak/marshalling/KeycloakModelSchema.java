@@ -64,6 +64,7 @@ import org.keycloak.models.cache.infinispan.events.UserFederationLinkUpdatedEven
 import org.keycloak.models.cache.infinispan.events.UserFullInvalidationEvent;
 import org.keycloak.models.cache.infinispan.events.UserUpdatedEvent;
 import org.keycloak.models.cache.infinispan.stream.GroupListPredicate;
+import org.keycloak.models.cache.infinispan.stream.HasClientScopePredicate;
 import org.keycloak.models.cache.infinispan.stream.HasRolePredicate;
 import org.keycloak.models.cache.infinispan.stream.InClientPredicate;
 import org.keycloak.models.cache.infinispan.stream.InGroupPredicate;
@@ -178,6 +179,7 @@ import org.infinispan.protostream.types.java.CommonTypes;
                 // models.cache.infinispan.stream package
                 GroupListPredicate.class,
                 HasRolePredicate.class,
+                HasClientScopePredicate.class,
                 InClientPredicate.class,
                 InGroupPredicate.class,
                 InIdentityProviderPredicate.class,
