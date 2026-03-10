@@ -28,6 +28,10 @@ public interface TimerProvider extends Provider {
 
     public void schedule(Runnable runnable, long intervalMillis, String taskName);
 
+    default void schedule(Runnable runnable, long initialDelayMillis, long intervalMillis, String taskName) {
+        schedule(runnable, intervalMillis, taskName);
+    }
+
     default void schedule(TaskRunner runner, long intervalMillis) {
         schedule(runner, intervalMillis, runner.getTaskName());
     }
@@ -36,6 +40,14 @@ public interface TimerProvider extends Provider {
 
     public default void scheduleTask(ScheduledTask scheduledTask, long intervalMillis) {
         scheduleTask(scheduledTask, intervalMillis, scheduledTask.getTaskName());
+    }
+
+    public default void scheduleTask(ScheduledTask scheduledTask, long initialDelayMillis, long intervalMillis) {
+        scheduleTask(scheduledTask, initialDelayMillis, intervalMillis, scheduledTask.getTaskName());
+    }
+
+    public default void scheduleTask(ScheduledTask scheduledTask, long initialDelayMillis, long intervalMillis, String taskName) {
+        scheduleTask(scheduledTask, intervalMillis, taskName);
     }
 
     /**

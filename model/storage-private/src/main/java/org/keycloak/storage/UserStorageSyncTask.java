@@ -70,6 +70,10 @@ final class UserStorageSyncTask implements ScheduledTask {
         return SynchronizationResult.empty();
     }
 
+    /**
+     * Schedules the sync task taking the last sync time into consideration to compute the initial delay.
+     * If no previous sync has occurred, the initial delay defaults to the full period.
+     */
     boolean schedule(KeycloakSession session) {
         UserStorageProviderModel provider = getStorageModel(session);
 
@@ -81,8 +85,12 @@ final class UserStorageSyncTask implements ScheduledTask {
                 return false;
             }
 
-            logger.debugf("Scheduling user periodic sync task '%s' for user storage provider '%s' in realm '%s' with period %d seconds", getTaskName(), provider.getName(), realmId, period);
-            timer.scheduleTask(this, period * 1000L);
+            long periodMillis = period * 1000L;
+            long initialDelayMillis = computeInitialDelay(provider, periodMillis);
+
+            logger.debugf("Scheduling user periodic sync task '%s' for user storage provider '%s' in realm '%s' with initial delay %d ms and period %d seconds",
+                    getTaskName(), provider.getName(), realmId, initialDelayMillis, period);
+            timer.scheduleTask(this, initialDelayMillis, periodMillis);
 
             return true;
         }
@@ -201,7 +209,31 @@ final class UserStorageSyncTask implements ScheduledTask {
         realm.updateComponent(provider);
     }
 
-    // Skip syncing if there is short time since last sync time.
+    /**
+     * Computes the initial delay for the first timer tick based on when the last sync happened.
+     * If no sync has happened yet, the full period is used. Otherwise, the delay is set to the
+     * remaining time since the last sync, so that a restarted or newly joined node does not
+     * wait a full period unnecessarily.
+     */
+    private long computeInitialDelay(UserStorageProviderModel provider, long periodMillis) {
+        int lastSyncTime = provider.getLastSync(syncMode);
+
+        if (lastSyncTime <= 0) {
+            return periodMillis;
+        }
+
+        long elapsedMillis = (Time.currentTime() - lastSyncTime) * 1000L;
+        long remainingMillis = periodMillis - elapsedMillis;
+
+        // If the remaining time is non-positive, the sync is already overdue — fire immediately.
+        return Math.max(remainingMillis, 1L);
+    }
+
+    /**
+     * Checks if enough time has passed since the last sync to allow a new sync to proceed. This is a secondary
+     * guard (in addition to the cluster lock) to prevent a node whose timer fires shortly after another node
+     * just completed a sync from triggering an unnecessary duplicate sync.
+     */
     private boolean isSyncPeriod(UserStorageProviderModel provider) {
         int lastSyncTime = provider.getLastSync(syncMode);
 
@@ -212,7 +244,12 @@ final class UserStorageSyncTask implements ScheduledTask {
         int currentTime = Time.currentTime();
         int timeSinceLastSync = currentTime - lastSyncTime;
 
-        return timeSinceLastSync > period;
+        // The threshold must be smaller than the period so legitimate periodic syncs are not
+        // skipped. Using min(TASK_EXECUTION_TIMEOUT, period / 2) filters out near-duplicate
+        // syncs from cluster nodes with slightly different clocks while scaling correctly
+        // for both large and small sync periods.
+        int threshold = Math.min(TASK_EXECUTION_TIMEOUT, period / 2);
+        return timeSinceLastSync > threshold;
     }
 
     private boolean isSchedulable(UserStorageProviderModel provider) {
