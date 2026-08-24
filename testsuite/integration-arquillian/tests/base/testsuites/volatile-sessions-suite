@@ -1,5 +1,4 @@
 KcSamlBrokerSessionNotOnOrAfterTest
-OidcClaimToUserSessionNoteMapperTest
 KcOidcBrokerTransientSessionsTest
 KcAdmSessionTest
 TransientSessionTest
