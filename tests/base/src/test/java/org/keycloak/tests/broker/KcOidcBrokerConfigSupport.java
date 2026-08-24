@@ -5,6 +5,7 @@ import java.util.Map;
 import org.keycloak.broker.oidc.KeycloakOIDCIdentityProviderFactory;
 import org.keycloak.broker.oidc.OIDCIdentityProviderConfig;
 import org.keycloak.models.IdentityProviderModel;
+import org.keycloak.protocol.ProtocolMapperUtils;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.protocol.oidc.mappers.AudienceProtocolMapper;
 import org.keycloak.protocol.oidc.mappers.HardcodedClaim;
@@ -25,8 +26,8 @@ import static org.keycloak.broker.oidc.OAuth2IdentityProviderConfig.TOKEN_ENDPOI
 /**
  * Shared broker configuration that mirrors the legacy {@code KcOidcBrokerConfiguration}: the consumer
  * realm brokers to the provider through the Keycloak-specific {@code keycloak-oidc} identity provider.
- * This is the default for the OIDC broker tests. Tests that need the generic {@code oidc} provider
- * (as the legacy suite did in a couple of cases) can extend this with a generic-provider variant.
+ * This is the default for the OIDC broker/mapper tests. Tests that need the generic {@code oidc}
+ * provider (as the legacy suite did in a couple of cases) use {@link OidcBrokerConfigSupport} instead.
  */
 public interface KcOidcBrokerConfigSupport extends BrokerConfigSupport {
 
@@ -137,6 +138,7 @@ public interface KcOidcBrokerConfigSupport extends BrokerConfigSupport {
                                             .config(OIDCAttributeMapperHelper.INCLUDE_IN_ACCESS_TOKEN, "true")
                                             .config(OIDCAttributeMapperHelper.INCLUDE_IN_USERINFO, "true")
                                             .config(OIDCAttributeMapperHelper.JSON_TYPE, "String")
+                                            .config(ProtocolMapperUtils.MULTIVALUED, "true")
                                             .config("user.attribute", ATTRIBUTE_TO_MAP_NAME)
                                             .build(),
                                     ProtocolMapperBuilder.create().name(ATTRIBUTE_TO_MAP_NAME_2)
@@ -147,6 +149,7 @@ public interface KcOidcBrokerConfigSupport extends BrokerConfigSupport {
                                             .config(OIDCAttributeMapperHelper.INCLUDE_IN_ACCESS_TOKEN, "true")
                                             .config(OIDCAttributeMapperHelper.INCLUDE_IN_USERINFO, "true")
                                             .config(OIDCAttributeMapperHelper.JSON_TYPE, "String")
+                                            .config(ProtocolMapperUtils.MULTIVALUED, "true")
                                             .config("user.attribute", ATTRIBUTE_TO_MAP_NAME_2)
                                             .build(),
                                     ProtocolMapperBuilder.create().name("hardcoded-attribute")
