@@ -13,14 +13,14 @@ import org.keycloak.testframework.ui.page.LoginPage;
 import org.keycloak.testframework.ui.webdriver.ManagedWebDriver;
 
 @KeycloakIntegrationTest
-public class KcOidcBrokerTest implements BrokerLoginTest, OidcBrokerConfigSupport {
+public class KcOidcBrokerTest implements BrokerLoginTest, KcOidcBrokerConfigSupport {
 
     @InjectRealm(ref = "provider", lifecycle = LifeCycle.METHOD,
-            config = OidcBrokerConfigSupport.OidcProviderRealmConfig.class)
+            config = KcOidcBrokerConfigSupport.OidcProviderRealmConfig.class)
     ManagedRealm providerRealm;
 
     @InjectRealm(ref = "consumer", lifecycle = LifeCycle.METHOD,
-            config = OidcBrokerConfigSupport.OidcConsumerRealmConfig.class)
+            config = KcOidcBrokerConfigSupport.OidcConsumerRealmConfig.class)
     ManagedRealm consumerRealm;
 
     @InjectOAuthClient(realmRef = "consumer")

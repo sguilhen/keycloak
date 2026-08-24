@@ -16,10 +16,10 @@ import org.keycloak.testframework.ui.page.LoginPage;
 import org.keycloak.testframework.ui.webdriver.ManagedWebDriver;
 
 @KeycloakIntegrationTest
-public class KcOidcBrokerClientSecretBasicAuthTest implements BrokerLoginTest, OidcBrokerConfigSupport {
+public class KcOidcBrokerClientSecretBasicAuthTest implements BrokerLoginTest, KcOidcBrokerConfigSupport {
 
     @InjectRealm(ref = "provider", lifecycle = LifeCycle.METHOD,
-            config = OidcBrokerConfigSupport.OidcProviderRealmConfig.class)
+            config = KcOidcBrokerConfigSupport.OidcProviderRealmConfig.class)
     ManagedRealm providerRealm;
 
     @InjectRealm(ref = "consumer", lifecycle = LifeCycle.METHOD,
@@ -71,8 +71,8 @@ public class KcOidcBrokerClientSecretBasicAuthTest implements BrokerLoginTest, O
     static class ConsumerRealmWithBasicAuth implements RealmConfig {
         @Override
         public RealmBuilder configure(RealmBuilder realm) {
-            return OidcBrokerConfigSupport.configureConsumerRealm(realm,
-                    OidcBrokerConfigSupport.createOidcIdentityProvider()
+            return KcOidcBrokerConfigSupport.configureConsumerRealm(realm,
+                    KcOidcBrokerConfigSupport.createOidcIdentityProvider()
                             .attribute("clientAuthMethod", OIDCLoginProtocol.CLIENT_SECRET_BASIC));
         }
     }

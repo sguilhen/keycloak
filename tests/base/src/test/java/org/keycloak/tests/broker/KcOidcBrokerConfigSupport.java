@@ -2,8 +2,8 @@ package org.keycloak.tests.broker;
 
 import java.util.Map;
 
+import org.keycloak.broker.oidc.KeycloakOIDCIdentityProviderFactory;
 import org.keycloak.broker.oidc.OIDCIdentityProviderConfig;
-import org.keycloak.broker.oidc.OIDCIdentityProviderFactory;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.protocol.oidc.mappers.AudienceProtocolMapper;
@@ -22,10 +22,16 @@ import org.junit.jupiter.api.BeforeEach;
 
 import static org.keycloak.broker.oidc.OAuth2IdentityProviderConfig.TOKEN_ENDPOINT_URL;
 
-public interface OidcBrokerConfigSupport extends BrokerConfigSupport {
+/**
+ * Shared broker configuration that mirrors the legacy {@code KcOidcBrokerConfiguration}: the consumer
+ * realm brokers to the provider through the Keycloak-specific {@code keycloak-oidc} identity provider.
+ * This is the default for the OIDC broker tests. Tests that need the generic {@code oidc} provider
+ * (as the legacy suite did in a couple of cases) can extend this with a generic-provider variant.
+ */
+public interface KcOidcBrokerConfigSupport extends BrokerConfigSupport {
 
     String IDP_OIDC_ALIAS = "kc-oidc-idp";
-    String IDP_OIDC_PROVIDER_ID = OIDCIdentityProviderFactory.PROVIDER_ID;
+    String IDP_OIDC_PROVIDER_ID = KeycloakOIDCIdentityProviderFactory.PROVIDER_ID;
     String CLIENT_ID = "brokerapp";
     String CLIENT_SECRET = "secret";
     String ATTRIBUTE_TO_MAP_NAME = "user-attribute";
