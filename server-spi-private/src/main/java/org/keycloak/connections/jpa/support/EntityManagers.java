@@ -68,7 +68,18 @@ public class EntityManagers {
     }
 
     /**
-     * Flush and optionally clear all the currently in use {@link EntityManager}s
+     * Flush and optionally clear all the currently in use {@link EntityManager}s.
+     * <p>
+     * WARNING: when {@code clear} is {@code true}, every entity currently managed by any open
+     * {@link EntityManager} in this session is detached. If a cache-layer provider (e.g. a
+     * {@code CacheRealmProvider} or {@code UserCache} implementation) is still holding a
+     * "managed" adapter wrapping one of those entities with an uninitialized lazy collection,
+     * a later access will throw {@code LazyInitializationException}. Callers that pass
+     * {@code clear=true} should also clear those providers' request-scoped managed-model maps
+     * immediately afterwards (a purely local, in-memory operation - not a cluster-wide cache
+     * eviction). See {@code org.keycloak.models.cache.CacheManagedModelsUtil#flushAndClearManagedModels}
+     * (module storage-private) for the shared helper; this class cannot call it directly since
+     * server-spi-private has no dependency on the model/storage modules that declare the cache SPIs.
      */
     public static void flush(KeycloakSession session, boolean clear) {
         forEachEntityManager(session, em -> {

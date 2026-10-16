@@ -123,6 +123,15 @@ public class StoreFactoryCacheSession implements CachedStoreFactoryProvider {
     }
 
     @Override
+    public void clearManagedModels() {
+        managedResourceServers.clear();
+        managedScopes.clear();
+        managedResources.clear();
+        managedPolicies.clear();
+        managedPermissionTickets.clear();
+    }
+
+    @Override
     public ResourceServerStore getResourceServerStore() {
         return resourceServerCache;
     }

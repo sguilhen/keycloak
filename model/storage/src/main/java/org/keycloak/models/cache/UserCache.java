@@ -47,4 +47,15 @@ public interface UserCache extends UserProvider {
      *
      */
     void clear();
+
+    /**
+     * Clears this session's request-scoped map of "managed" user adapters that keep
+     * references to {@link UserModel} delegates (and therefore to their underlying,
+     * possibly lazily-loaded JPA entities). Unlike {@link #clear()} this is a purely
+     * local, in-memory operation - it does not evict anything from the distributed
+     * cache or notify the cluster. Must be called after the persistence context has
+     * been detached (e.g. via {@code EntityManagers.flush(session, true)}) to avoid
+     * stale adapters throwing {@code LazyInitializationException} later.
+     */
+    void clearManagedModels();
 }

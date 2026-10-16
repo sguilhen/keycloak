@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.keycloak.connections.jpa.support.EntityManagers;
 import org.keycloak.exportimport.ExportProvider;
 import org.keycloak.exportimport.UsersExportStrategy;
 import org.keycloak.exportimport.util.ExportImportSessionTask.Mode;
@@ -33,6 +32,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.cache.CacheManagedModelsUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.storage.UserStoragePrivateUtil;
@@ -159,7 +159,7 @@ public abstract class MultipleStepsExportProvider<T extends MultipleStepsExportP
                 logger.infof("%sUsers %s - %s exported", federated ? "Federated " : "", start, start + usersBatch.size() - 1);
                 usersHolder.file++;
                 usersBatch.clear();
-                EntityManagers.flush(session, true);
+                CacheManagedModelsUtil.flushAndClearManagedModels(session);
             }
 
         }.runTask(factory, Mode.BATCHED);

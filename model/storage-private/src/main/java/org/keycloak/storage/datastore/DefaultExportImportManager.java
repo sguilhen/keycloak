@@ -80,6 +80,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.WebAuthnPolicy;
 import org.keycloak.models.WebAuthnPolicyPasswordlessDefaults;
 import org.keycloak.models.WebAuthnPolicyTwoFactorDefaults;
+import org.keycloak.models.cache.CacheManagedModelsUtil;
 import org.keycloak.models.utils.ComponentUtil;
 import org.keycloak.models.utils.DefaultAuthenticationFlows;
 import org.keycloak.models.utils.DefaultKeyProviders;
@@ -176,7 +177,7 @@ public class DefaultExportImportManager implements ExportImportManager {
             // higher - the important part is to clear the contexts - which could be even more optimal
             // as detaching just users and their children
             if (++count % 64 == 0) {
-                EntityManagers.flush(session, true);
+                CacheManagedModelsUtil.flushAndClearManagedModels(session);
             }
         };
     }
@@ -503,6 +504,7 @@ public class DefaultExportImportManager implements ExportImportManager {
                     }
                 }
             }, true);
+            CacheManagedModelsUtil.flushAndClearManagedModels(session);
         }
 
         if (userImport != null) {
@@ -1332,6 +1334,7 @@ public class DefaultExportImportManager implements ExportImportManager {
                 batcher.accept(session);
             }
         }, true);
+        CacheManagedModelsUtil.flushAndClearManagedModels(session);
 
     }
 

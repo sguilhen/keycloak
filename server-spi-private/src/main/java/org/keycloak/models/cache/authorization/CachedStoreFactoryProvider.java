@@ -24,4 +24,11 @@ import org.keycloak.authorization.store.StoreFactory;
  * @author <a href="mailto:psilva@redhat.com">Pedro Igor</a>
  */
 public interface CachedStoreFactoryProvider extends StoreFactory {
+
+    /**
+     * Clears this session's request-scoped maps of managed resource-server/resource/scope/
+     * policy/permission-ticket adapters. Purely local, in-memory; see
+     * {@link org.keycloak.models.cache.UserCache#clearManagedModels()}.
+     */
+    void clearManagedModels();
 }

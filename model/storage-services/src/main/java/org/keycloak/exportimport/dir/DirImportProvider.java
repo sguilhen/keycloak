@@ -26,7 +26,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.keycloak.Config;
-import org.keycloak.connections.jpa.support.EntityManagers;
 import org.keycloak.exportimport.AbstractFileBasedImportProvider;
 import org.keycloak.exportimport.Strategy;
 import org.keycloak.exportimport.util.ExportImportSessionTask;
@@ -35,6 +34,7 @@ import org.keycloak.exportimport.util.ImportUtils;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.cache.CacheManagedModelsUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.resources.KeycloakApplication;
@@ -103,7 +103,7 @@ public class DirImportProvider extends AbstractFileBasedImportProvider {
             for (String realmName : realmNames) {
                 importRealm(realmName, strategy);
                 Optional.ofNullable(KeycloakSessionUtil.getKeycloakSession())
-                        .ifPresent(session -> EntityManagers.flush(session, true));
+                        .ifPresent(CacheManagedModelsUtil::flushAndClearManagedModels);
             }
         }
         ServicesLogger.LOGGER.importSuccess();

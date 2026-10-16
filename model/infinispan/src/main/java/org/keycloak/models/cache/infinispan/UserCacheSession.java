@@ -134,6 +134,11 @@ public class UserCacheSession implements UserCache, OnCreateComponent, OnUpdateC
         cluster.notify(InfinispanUserCacheProviderFactory.USER_CLEAR_CACHE_EVENTS, ClearCacheEvent.getInstance(), true);
     }
 
+    @Override
+    public void clearManagedModels() {
+        managedUsers.clear();
+    }
+
     public UserProvider getDelegate() {
         if (!transactionActive) throw new IllegalStateException("Cannot access delegate without a transaction");
         if (delegate != null) return delegate;

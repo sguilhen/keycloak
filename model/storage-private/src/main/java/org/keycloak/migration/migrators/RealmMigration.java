@@ -19,11 +19,10 @@
 
 package org.keycloak.migration.migrators;
 
-import org.keycloak.connections.jpa.support.EntityManagers;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.cache.CacheRealmProvider;
+import org.keycloak.models.cache.CacheManagedModelsUtil;
 import org.keycloak.representations.idm.RealmRepresentation;
 
 import org.jboss.logging.Logger;
@@ -34,13 +33,9 @@ public abstract class RealmMigration implements Migration {
 
     @Override
     public void migrate(KeycloakSession session) {
-        CacheRealmProvider realmCache = session.getProvider(CacheRealmProvider.class);
         session.realms().getRealmsStream().forEach(realm -> {
-            // empty out the persistence context for each realm
-            EntityManagers.flush(session, true);
-            if (realmCache != null) {
-                realmCache.clearManagedModels();
-            }
+            // empty out the persistence context (and any managed cache-adapter references) for each realm
+            CacheManagedModelsUtil.flushAndClearManagedModels(session);
             // alternatively could be EntityManagers.runInBatch - but that also changes the
             // query modes, which I'm not sure is applicable here
             KeycloakContext context = session.getContext();

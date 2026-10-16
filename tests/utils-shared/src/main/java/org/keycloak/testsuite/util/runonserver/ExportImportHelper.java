@@ -76,6 +76,7 @@ public final class ExportImportHelper {
             System.clearProperty(PROVIDER);
             System.clearProperty(ACTION);
             System.clearProperty(FILE);
+            System.clearProperty(USERS_PER_FILE);
         };
     }
 }
