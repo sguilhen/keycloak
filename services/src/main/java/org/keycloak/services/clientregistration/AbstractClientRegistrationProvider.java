@@ -49,6 +49,7 @@ import org.keycloak.models.RoleModel;
 import org.keycloak.models.utils.ModelToRepresentation;
 import org.keycloak.models.utils.RepresentationToModel;
 import org.keycloak.models.utils.StripSecretsUtils;
+import org.keycloak.protocol.oidc.OIDCConfigAttributes;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -401,7 +402,8 @@ public abstract class AbstractClientRegistrationProvider implements ClientRegist
     }
 
     /**
-     * Strips privileged {@code ssf.*} attributes from non-Admin representations.
+     * Strips privileged attributes from non-Admin representations: {@code ssf.*} and the external token
+     * attributes that authorize a client to retrieve stored identity provider tokens.
      *
      * <p>Reserved for the Admin API; silently removed for DCR callers (IAT/RAT)
      * without throwing an error.
@@ -414,6 +416,8 @@ public abstract class AbstractClientRegistrationProvider implements ClientRegist
             return;
         }
         rep.getAttributes().entrySet()
-                .removeIf(e -> e.getKey().startsWith("ssf."));
+                .removeIf(e -> e.getKey().startsWith("ssf.")
+                        || OIDCConfigAttributes.EXTERNAL_TOKEN_ENABLED.equals(e.getKey())
+                        || OIDCConfigAttributes.EXTERNAL_TOKEN_IDP.equals(e.getKey()));
     }
 }
